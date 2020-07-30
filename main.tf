@@ -140,7 +140,7 @@ resource "aws_iam_instance_profile" "windows_instance_profile" {
   role = aws_iam_role.windows_instance_role.name
 }
 
-resource "aws_spot_instance_request" "windows_instance" {
+resource "aws_instance" "windows_instance" {
   instance_type = var.instance_type
   availability_zone = local.availability_zone
   ami = (length(var.custom_ami) > 0) ? var.custom_ami : data.aws_ami.windows_ami.image_id
@@ -161,10 +161,6 @@ resource "aws_spot_instance_request" "windows_instance" {
   })
   iam_instance_profile = aws_iam_instance_profile.windows_instance_profile.id
 
-  # Spot configuration
-  spot_type = "one-time"
-  wait_for_fulfillment = true
-
   # EBS configuration
   ebs_optimized = true
   root_block_device {
@@ -178,15 +174,15 @@ resource "aws_spot_instance_request" "windows_instance" {
 }
 
 output "instance_id" {
-  value = aws_spot_instance_request.windows_instance.spot_instance_id
+  value = aws_instance.windows_instance.id
 }
 
 output "instance_ip" {
-  value = aws_spot_instance_request.windows_instance.public_ip
+  value = aws_instance.windows_instance.public_ip
 }
 
 output "instance_public_dns" {
-  value = aws_spot_instance_request.windows_instance.public_dns
+  value = aws_instance.windows_instance.public_dns
 }
 
 output "instance_password" {
